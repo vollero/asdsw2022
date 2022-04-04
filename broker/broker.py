@@ -19,6 +19,8 @@ def connection_manager_thread(addr, conn):
         data = conn.recv(1024)
         if not data:
             break
+        if bool(re.search('^\[DISCONNECT\]', data.decode('utf-8'))):
+            connect = False
         print('{}: chat message: {}'.format(addr, data[:-1].decode('utf-8')))
     
     mutex.acquire()
