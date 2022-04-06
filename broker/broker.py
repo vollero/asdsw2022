@@ -40,14 +40,27 @@ def connection_manager_thread(id_, conn):
             # logica di sottoscrizione
             mutexTOPICs.acquire()
             if not topic in topics:
-                topics[topic] = set()
-            
+                topics[topic] = set()    
             topics[topic].add(id_)
             mutexTOPICs.release()
-            #print(topics)
+            print(topics)
             # notifica utente avvenuta sottoscrizione
             response = 'Sottoscritto al topic: {}\n'.format(topic)
             conn.sendall(response.encode())
+
+        if bool(re.search('^\[UNSUBSCRIBE\]', data.decode('utf-8'))):
+            topic = re.findall(regexTOPIC, data.decode('utf-8'))[0]
+            # logica di sottoscrizione
+            mutexTOPICs.acquire()
+            if topic in topics:
+                if id_ in topics[topic]:
+                    topics[topic].remove(id_)   
+            mutexTOPICs.release()
+            print(topics)
+            # notifica utente avvenuta sottoscrizione
+            response = 'Cancellazione della sottoscrizione al topic: {}\n'.format(topic)
+            conn.sendall(response.encode())
+
 
         print('{}: chat message: {}'.format(id_, data[:-1].decode('utf-8')))
     
