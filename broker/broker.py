@@ -4,6 +4,25 @@ import re
 from threading import Thread, Lock
 import json
 
+def decodeCommand(message):
+    regexCOMMAND = r'^\[([A-Z]+)\]'
+    regexJSON = r"(\{[\"a-zA-Z0-9\,\ \:\"]+\})"
+
+    withArgs = {"SUBSCRIBE", "UNSUBSCRIBE"}    
+
+    command = re.findall(regexCOMMAND, message)[0]
+    comando = None
+
+    if command:
+        comando = dict()
+        comando['azione'] = command
+        if command in withArgs:
+            stringa = re.findall(regexJSON, message)[0]
+            parametri = json.loads(stringa)
+            comando['parametri'] = parametri
+
+    return comando
+
 def connection_manager_thread(id_, conn):
     global activeConnections
     global mutexACs 
@@ -16,7 +35,8 @@ def connection_manager_thread(id_, conn):
     
     while not connected:
         data = conn.recv(1024)
-        if bool(re.search('^\[CONNECT\]', data.decode('utf-8'))):
+        comando = decodeCommand(data.decode('utf-8'))
+        if comando['azione'] == "CONNECT":
             connected = True
             mutexACs.acquire()
             activeConnections[id_]['connected'] = True
