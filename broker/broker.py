@@ -54,7 +54,10 @@ def connection_manager_thread(id_, conn):
         data = conn.recv(1024)
         if not data:
             break
-        if bool(re.search('^\[DISCONNECT\]', data.decode('utf-8'))):
+
+        comando = decodeCommand(data.decode('utf-8'))
+
+        if comand0['azione'] == "DISCONNECT":
             connected = False
 
         if bool(re.search('^\[SUBSCRIBE\]', data.decode('utf-8'))):
