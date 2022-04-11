@@ -124,6 +124,17 @@ def connection_manager_thread(id_, conn):
         print('{}: chat message: {}'.format(id_, data[:-1].decode('utf-8')))
     
     mutexACs.acquire()
+    curr_topics = activeConnections[id_]["topics"]    
+    mutexACs.release()
+
+    mutexTOPICs.acquire()
+    for topic in curr_topics:
+        topics[topic].remove(id_)
+        if len(topics[topic]) == 0:
+            del topics[topic]
+    mutexTOPICs.release()
+
+    mutexACs.acquire()
     del activeConnections[id_]
     mutexACs.release()
     conn.close()
