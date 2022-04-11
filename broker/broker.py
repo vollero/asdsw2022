@@ -8,7 +8,7 @@ def decodeCommand(message):
     regexCOMMAND = r'^\[([A-Z]+)\]'
     regexJSON = r"(\{[\"a-zA-Z0-9\,\ \:\"]+\})"
 
-    withArgs = {"SUBSCRIBE", "UNSUBSCRIBE"}    
+    withArgs = {"SUBSCRIBE", "UNSUBSCRIBE", "SEND"}    
 
     command = re.findall(regexCOMMAND, message)[0]
     comando = None
@@ -79,13 +79,10 @@ def connection_manager_thread(id_, conn):
             response = 'Sottoscritto al topic: {}\n'.format(topic)
             conn.sendall(response.encode())
 
-        if bool(re.search('^\[UNSUBSCRIBE\]', data.decode('utf-8'))):
-            stringa = re.findall(regexJSON, data.decode('utf-8'))[0]
-            parametri = json.loads(stringa)
-            topic = parametri["topic"]
+        if comando['azione'] == "UNSUBSCRIBE":
+            topic = comando['parametri']['topic']
 
             # logica di sottoscrizione
-
             mutexACs.acquire()
             activeConnections[id_]["topics"].remove(topic)
             mutexACs.release()
@@ -102,11 +99,9 @@ def connection_manager_thread(id_, conn):
             response = 'Cancellazione della sottoscrizione al topic: {}\n'.format(topic)
             conn.sendall(response.encode())
 
-        if bool(re.search('^\[SEND\]', data.decode('utf-8'))):
-            stringa = re.findall(regexJSON, data.decode('utf-8'))[0]
-            parametri = json.loads(stringa)
-            topic = parametri["topic"]
-            message = parametri["message"]
+        if comando['azione'] == "SEND":
+            topic = comando["parametri"]["topic"]
+            message = comando["parametri"]["message"]
 
             # logica di invio del messaggio
             risposta = dict()
@@ -114,7 +109,7 @@ def connection_manager_thread(id_, conn):
             risposta["topic"] = topic
             risposta["messaggio"] = message
 
-            stringa = json.dumps(risposta)
+            stringa = json.dumps(risposta) + '\n'
             print(stringa)
 
             mutexACs.acquire()
