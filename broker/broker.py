@@ -57,19 +57,11 @@ def connection_manager_thread(id_, conn):
 
         comando = decodeCommand(data.decode('utf-8'))
 
-        if comand0['azione'] == "DISCONNECT":
+        if comando['azione'] == "DISCONNECT":
             connected = False
 
-        if bool(re.search('^\[SUBSCRIBE\]', data.decode('utf-8'))):
-            stringa = re.findall(regexJSON, data.decode('utf-8'))[0]
-            parametri = json.loads(stringa)
-            '''
-            if "topic" in parametri:
-                pass
-            if "topics" in parametri:
-                pass
-            '''
-            topic = parametri["topic"]
+        if comando['azione'] == "SUBSCRIBE":
+            topic = comando['parametri']['topic']
             
             # logica di sottoscrizione
             mutexACs.acquire()
