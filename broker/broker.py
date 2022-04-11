@@ -30,8 +30,6 @@ def connection_manager_thread(id_, conn):
     global topics
     connected = False
     print('Client: {}'.format(id_))
-    regexTOPIC = r"\{\"topic\":[\ ]\"([a-zA-Z0-9]+)\"\}"
-    regexJSON = r"(\{[\"a-zA-Z0-9\,\ \:\"]+\})"
     
     while not connected:
         data = conn.recv(1024)
