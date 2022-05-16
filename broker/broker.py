@@ -5,11 +5,12 @@ from threading import Thread, Lock
 import json
 
 def decodeCommand(message, stato):
-    regexCOMMAND = r'^\[([A-Z]+)\]'
+    regexCOMMAND = r"^\[([A-Z]+)\]"
     regexJSON = r"(\{[\"a-zA-Z0-9\,\ \:\"\]\[]+\})"
 
     withArgs = {"SUBSCRIBE", "UNSUBSCRIBE", "SEND"}    
 
+    :wq
     command = re.findall(regexCOMMAND, message)[0]
     comando = None
 
