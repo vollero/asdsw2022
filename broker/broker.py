@@ -10,7 +10,6 @@ def decodeCommand(message, stato):
 
     withArgs = {"SUBSCRIBE", "UNSUBSCRIBE", "SEND"}    
 
-    :wq
     command = re.findall(regexCOMMAND, message)[0]
     comando = None
 
